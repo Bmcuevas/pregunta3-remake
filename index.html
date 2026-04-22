@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pregunta3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --bg:        #0e0c14;
+      --bg2:       #151320;
+      --bg3:       #1c1929;
+      --line:      rgba(255,255,255,0.07);
+      --text:      #f0eeff;
+      --muted:     #7b7899;
+      --pill:      100px;
+
+      --c-pic:  #ff3d6e;
+      --c-pre:  #ffb300;
+      --c-ino:  #00e676;
+      --c-con:  #f06292;
+      --c-ing:  #40c4ff;
+      --c-cul:  #ce93d8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Noise */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── SCREENS ────────────────────────────────────────────── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ── SHARED: NAV BAR ────────────────────────────────────── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nav-logo .num { color: var(--c-pic); }
+
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      padding: 0.45rem 1rem;
+      border-radius: var(--pill);
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .btn-back:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    /* ══════════════════════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════════════════════ */
+    #screen-hero {
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Background blobs */
+    .hero-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.12;
+      pointer-events: none;
+      animation: blobDrift 12s ease-in-out infinite;
+    }
+    .hero-blob:nth-child(1) { width:500px;height:500px; background:var(--c-pic); top:-15%;left:-10%; animation-delay:0s; }
+    .hero-blob:nth-child(2) { width:400px;height:400px; background:var(--c-cul); bottom:-10%;right:-5%; animation-delay:-4s; }
+    .hero-blob:nth-child(3) { width:280px;height:280px; background:var(--c-ing); top:50%;left:60%; animation-delay:-8s; }
+    @keyframes blobDrift {
+      0%,100% { transform: translate(0,0); }
+      33%      { transform: translate(25px,-35px); }
+      66%      { transform: translate(-20px,25px); }
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* The main logo mark */
+    .logo-mark {
+      margin-bottom: 1.75rem;
+      line-height: 1;
+    }
+
+    .logo-word {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5.5rem, 18vw, 13rem);
+      letter-spacing: 0.02em;
+      color: var(--text);
+      display: block;
+    }
+
+    .logo-num-wrap {
+      display: inline-block;
+      position: relative;
+    }
+    .logo-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5.5rem, 18vw, 13rem);
+      color: var(--c-pic);
+      position: relative;
+      z-index: 1;
+    }
+    /* glow behind the 3 */
+    .logo-num::before {
+      content: '3';
+      position: absolute; inset: 0;
+      color: transparent;
+      filter: blur(28px);
+      background: var(--c-pic);
+      -webkit-background-clip: text;
+      background-clip: text;
+      opacity: 0.5;
+      z-index: -1;
+    }
+
+    .hero-tagline {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: var(--muted);
+      max-width: 360px;
+      line-height: 1.65;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-start {
+      display: inline-flex; align-items: center; gap: 0.7rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem; font-weight: 800;
+      color: #fff;
+      background: var(--c-pic);
+      border: none;
+      padding: 1rem 2.2rem;
+      border-radius: var(--pill);
+      cursor: pointer;
+      transition: transform .25s, box-shadow .25s;
+      box-shadow: 0 0 0 rgba(255,61,110,0);
+    }
+    .btn-start:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 16px 50px rgba(255,61,110,0.45);
+    }
+    .btn-start .arr { transition: transform .25s; }
+    .btn-start:hover .arr { transform: translateX(5px); }
+
+    /* Swatches row */
+    .cat-swatches {
+      display: flex; gap: 0.5rem; margin-top: 2.75rem;
+    }
+    .swatch {
+      width: 10px; height: 10px; border-radius: 50%; opacity: 0.45;
+      transition: opacity .2s, transform .2s;
+    }
+    .swatch:hover { opacity: 1; transform: scale(1.4); }
+
+    /* ══════════════════════════════════════════════════════════
+       CATEGORIES
+    ══════════════════════════════════════════════════════════ */
+    #screen-categories { align-items: stretch; }
+
+    .cats-body {
+      flex: 1;
+      padding: 2.5rem 2rem 3rem;
+      max-width: 1140px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .cats-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.4rem;
+    }
+    .cats-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .cats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    /* Each category card */
+    .cc {
+      --c: #ff3d6e;
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 0;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, border-color .3s;
+    }
+    .cc:hover {
+      transform: translateY(-5px);
+      border-color: var(--c);
+      box-shadow: 0 20px 55px color-mix(in srgb, var(--c) 20%, transparent);
+    }
+
+    /* top accent bar */
+    .cc-bar {
+      height: 4px;
+      background: var(--c);
+      width: 100%;
+    }
+
+    .cc-inner {
+      padding: 1.6rem 1.75rem 1.5rem;
+    }
+
+    .cc-row {
+      display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.9rem;
+    }
+    .cc-icon-box {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--c) 16%, transparent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .cc-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+    }
+    .cc-count {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--c);
+      letter-spacing: 0.02em;
+    }
+    .cc-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Per-category colors */
+    .cc[data-cat="picantes"]    { --c: var(--c-pic); }
+    .cc[data-cat="previa"]      { --c: var(--c-pre); }
+    .cc[data-cat="inofensivas"] { --c: var(--c-ino); }
+    .cc[data-cat="conocen"]     { --c: var(--c-con); }
+    .cc[data-cat="ingenieros"]  { --c: var(--c-ing); }
+    .cc[data-cat="cultura"]     { --c: var(--c-cul); }
+
+    /* ══════════════════════════════════════════════════════════
+       GAME SCREEN
+    ══════════════════════════════════════════════════════════ */
+    #screen-game {
+      align-items: stretch;
+      --ac: #ff3d6e; /* active color, updated by JS */
+    }
+
+    .game-body {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 2rem 1.5rem 3rem;
+      position: relative;
+    }
+
+    /* ambient glow */
+    .game-glow {
+      position: absolute;
+      top: -80px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 400px;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.09;
+      background: var(--ac);
+      pointer-events: none;
+      transition: background .5s;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      width: 100%; max-width: 680px;
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      position: relative; z-index: 1;
+    }
+    #progress-fill {
+      height: 100%;
+      background: var(--ac);
+      border-radius: 2px;
+      transition: width .5s ease, background .5s;
+    }
+
+    /* Game top row */
+    .game-top {
+      width: 100%; max-width: 680px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+      position: relative; z-index: 1;
+    }
+    .game-pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.82rem; font-weight: 800;
+      padding: 0.4rem 1rem;
+      border-radius: var(--pill);
+      background: color-mix(in srgb, var(--ac) 16%, transparent);
+      color: var(--ac);
+      border: 1px solid color-mix(in srgb, var(--ac) 30%, transparent);
+      transition: background .5s, color .5s, border-color .5s;
+    }
+    .game-counter {
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── CARD ─────────────────────────────────────────────── */
+    .card-scene {
+      width: 100%; max-width: 660px;
+      height: 360px;
+      perspective: 1100px;
+      cursor: pointer;
+      margin-bottom: 2rem;
+      position: relative; z-index: 1;
+    }
+    @media(max-width:480px) { .card-scene { height: 280px; } }
+
+    .card-flipper {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .65s cubic-bezier(.4,.2,.2,1);
+    }
+    .card-flipper.is-flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute; inset: 0;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* ─ Front face ─ */
+    .card-front {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--ac) 18%, transparent) inset,
+        0 0 60px color-mix(in srgb, var(--ac) 7%, transparent);
+      transition: box-shadow .5s;
+    }
+
+    /* stacked card illusion */
+    .card-front::after {
+      content: '';
+      position: absolute;
+      inset: 12px -8px -12px;
+      background: var(--bg3);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      z-index: -1;
+    }
+
+    /* decorative suit corners */
+    .card-front::before {
+      content: attr(data-icon);
+      position: absolute;
+      top: 1rem; left: 1.1rem;
+      font-size: 1.1rem;
+      opacity: 0.18;
+    }
+
+    .front-icon { font-size: 4rem; line-height: 1; user-select: none; }
+    .front-label {
+      font-size: 0.72rem; font-weight: 800;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ─ Back face ─ */
+    .card-back {
+      transform: rotateY(180deg);
+      background: var(--bg2);
+      border: 1.5px solid color-mix(in srgb, var(--ac) 45%, transparent);
+      border-radius: 20px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 2.5rem 2.5rem 2rem;
+      gap: 0;
+      box-shadow: 0 0 80px color-mix(in srgb, var(--ac) 22%, transparent);
+      transition: border-color .5s, box-shadow .5s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* subtle gradient wash */
+    .card-back::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 100% 80% at 50% 0%,
+        color-mix(in srgb, var(--ac) 14%, transparent),
+        transparent 65%);
+      pointer-events: none;
+      border-radius: inherit;
+      transition: background .5s;
+    }
+
+    .q-badge {
+      font-size: 0.62rem; font-weight: 800;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--ac);
+      opacity: 0.7;
+      margin-bottom: 1.25rem;
+      position: relative;
+      transition: color .5s;
+    }
+
+    .q-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(1.1rem, 3.5vw, 1.55rem);
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text);
+      position: relative;
+    }
+
+    .q-answer {
+      margin-top: 1.3rem;
+      padding: 0.8rem 1.1rem;
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--ac) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ac) 22%, transparent);
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--ac);
+      display: none;
+      position: relative;
+      text-align: center;
+      transition: background .5s, border-color .5s, color .5s;
+    }
+
+    /* ── CONTROLS ──────────────────────────────────────────── */
+    .game-controls {
+      display: flex; flex-wrap: wrap;
+      gap: 0.75rem; justify-content: center;
+      position: relative; z-index: 1;
+    }
+
+    .btn-main {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem; font-weight: 800;
+      color: #fff;
+      background: var(--ac);
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: var(--pill);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, background .5s;
+    }
+    .btn-main:hover {
+      transform: scale(1.04);
+      box-shadow: 0 10px 35px color-mix(in srgb, var(--ac) 45%, transparent);
+    }
+
+    .btn-sec {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--muted);
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      padding: 0.9rem 1.4rem;
+      border-radius: var(--pill);
+      cursor: pointer;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .btn-sec:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.18);
+      background: var(--bg3);
+    }
+
+    .game-tip {
+      margin-top: 1.4rem;
+      font-size: 0.73rem; font-weight: 600;
+      color: var(--muted);
+      opacity: 0.45;
+      position: relative; z-index: 1;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── ANIMATIONS ────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .screen.active > * { animation: fadeUp .45s ease both; }
+    .screen.active > *:nth-child(1) { animation-delay:.04s; }
+    .screen.active > *:nth-child(2) { animation-delay:.10s; }
+    .screen.active > *:nth-child(3) { animation-delay:.16s; }
+    .screen.active > *:nth-child(4) { animation-delay:.22s; }
+    .screen.active > *:nth-child(5) { animation-delay:.28s; }
+
+    .cats-grid .cc:nth-child(1) { animation-delay:.08s; }
+    .cats-grid .cc:nth-child(2) { animation-delay:.14s; }
+    .cats-grid .cc:nth-child(3) { animation-delay:.20s; }
+    .cats-grid .cc:nth-child(4) { animation-delay:.26s; }
+    .cats-grid .cc:nth-child(5) { animation-delay:.32s; }
+    .cats-grid .cc:nth-child(6) { animation-delay:.38s; }
+
+    /* Card shake */
+    .card-scene.shake .card-flipper {
+      animation: cardShake .38s cubic-bezier(.36,.07,.19,.97);
+    }
+    @keyframes cardShake {
+      0%   { transform: rotateZ(0) scale(1); }
+      20%  { transform: rotateZ(-2deg) scale(.97); }
+      50%  { transform: rotateZ(2.5deg) scale(.98); }
+      80%  { transform: rotateZ(-1deg) scale(.99); }
+      100% { transform: rotateZ(0) scale(1); }
+    }
+    .card-scene.shake .card-flipper.is-flipped {
+      animation: cardShakeFlipped .38s cubic-bezier(.36,.07,.19,.97);
+    }
+    @keyframes cardShakeFlipped {
+      0%   { transform: rotateY(180deg) rotateZ(0) scale(1); }
+      20%  { transform: rotateY(180deg) rotateZ(-2deg) scale(.97); }
+      50%  { transform: rotateY(180deg) rotateZ(2.5deg) scale(.98); }
+      100% { transform: rotateY(180deg) rotateZ(0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     HERO
+════════════════════════════════ -->
+<section id="screen-hero" class="screen active">
+  <div class="hero-blob"></div>
+  <div class="hero-blob"></div>
+  <div class="hero-blob"></div>
+
+  <div class="hero-inner">
+    <div class="logo-mark">
+      <span class="logo-word">PREGUNTA</span>
+      <span class="logo-num-wrap"><span class="logo-num">3</span></span>
+    </div>
+
+    <p class="hero-tagline">El juego de preguntas para conocerse de verdad, romper el hielo y pasar una noche que no van a olvidar.</p>
+
+    <button class="btn-start" onclick="showScreen('categories')">
+      Empezar a jugar <span class="arr">→</span>
+    </button>
+
+    <div class="cat-swatches">
+      <div class="swatch" style="background:var(--c-pic)"></div>
+      <div class="swatch" style="background:var(--c-pre)"></div>
+      <div class="swatch" style="background:var(--c-ino)"></div>
+      <div class="swatch" style="background:var(--c-con)"></div>
+      <div class="swatch" style="background:var(--c-ing)"></div>
+      <div class="swatch" style="background:var(--c-cul)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     CATEGORIES
+════════════════════════════════ -->
+<section id="screen-categories" class="screen">
+  <nav class="nav">
+    <button class="btn-back" onclick="showScreen('hero')">← Inicio</button>
+    <span class="nav-logo" onclick="showScreen('hero')">PREGUNTA<span class="num">3</span></span>
+    <div style="width:80px"></div>
+  </nav>
+
+  <div class="cats-body">
+    <h2 class="cats-heading">Elegí una categoría</h2>
+    <p class="cats-sub">Cada categoría tiene su propia vibra. Ustedes eligen.</p>
+
+    <div class="cats-grid">
+
+      <div class="cc" data-cat="picantes" onclick="startGame('picantes')">
+        <div class="cc-bar"></div>
+        <div class="cc-inner">
+          <div class="cc-row">
+            <div class="cc-icon-box">🌶️</div>
+            <div>
+              <div class="cc-title">Picantes +18</div>
+              <div class="cc-count">45 cartas</div>
+            </div>
+          </div>
+          <div class="cc-desc">Para los valientes. Preguntas que ponen colorado a más de uno en la mesa.</div>
+        </div>
+      </div>
+
+      <div class="cc" data-cat="previa" onclick="startGame('previa')">
+        <div class="cc-bar"></div>
+        <div class="cc-inner">
+          <div class="cc-row">
+            <div class="cc-icon-box">🍻</div>
+            <div>
+              <div class="cc-title">De Previa</div>
+              <div class="cc-count">42 cartas</div>
+            </div>
+          </div>
+          <div class="cc-desc">El calentamiento perfecto antes de salir. Para arrancar la noche con todo.</div>
+        </div>
+      </div>
+
+      <div class="cc" data-cat="inofensivas" onclick="startGame('inofensivas')">
+        <div class="cc-bar"></div>
+        <div class="cc-inner">
+          <div class="cc-row">
+            <div class="cc-icon-box">😇</div>
+            <div>
+              <div class="cc-title">Inofensivas</div>
+              <div class="cc-count">42 cartas</div>
+            </div>
+          </div>
+          <div class="cc-desc">Divertidas para todas las edades. Sin dramas, sin vergüenzas.</div>
+        </div>
+      </div>
+
+      <div class="cc" data-cat="conocen" onclick="startGame('conocen')">
+        <div class="cc-bar"></div>
+        <div class="cc-inner">
+          <div class="cc-row">
+            <div class="cc-icon-box">💕</div>
+            <div>
+              <div class="cc-title">¿Cuánto te conocen?</div>
+              <div class="cc-count">40 cartas</div>
+            </div>
+          </div>
+          <div class="cc-desc">Descubrí si tus amigos realmente saben quién sos. Sorpresas garantizadas.</div>
+        </div>
+      </div>
+
+      <div class="cc" data-cat="ingenieros" onclick="startGame('ingenieros')">
+        <div class="cc-bar"></div>
+        <div class="cc-inner">
+          <div class="cc-row">
+            <div class="cc-icon-box">⚙️</div>
+            <div>
+              <div class="cc-title">Solo Ingenieros</div>
+              <div class="cc-count">95 cartas</div>
+            </div>
+          </div>
+          <div class="cc-desc">Análisis, física, termodinámica, fluidos, bugs reales y debates técnicos.</div>
+        </div>
+      </div>
+
+      <div class="cc" data-cat="cultura" onclick="startGame('cultura')">
+        <div class="cc-bar"></div>
+        <div class="cc-inner">
+          <div class="cc-row">
+            <div class="cc-icon-box">🌍</div>
+            <div>
+              <div class="cc-title">Cultura General</div>
+              <div class="cc-count">46 cartas</div>
+            </div>
+          </div>
+          <div class="cc-desc">Historia, ciencia, geografía y más. ¿Cuánto sabés en realidad?</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     GAME
+════════════════════════════════ -->
+<section id="screen-game" class="screen">
+  <nav class="nav">
+    <button class="btn-back" onclick="showScreen('categories')">← Categorías</button>
+    <span class="nav-logo" onclick="showScreen('hero')">PREGUNTA<span class="num">3</span></span>
+    <div id="game-counter" class="game-counter">1 / 45</div>
+  </nav>
+
+  <div class="game-body">
+    <div class="game-glow" id="game-glow"></div>
+
+    <div class="game-top">
+      <div class="game-pill" id="game-pill">🌶️ Picantes +18</div>
+      <div></div>
+    </div>
+
+    <div class="progress-wrap">
+      <div id="progress-fill" style="width:0%"></div>
+    </div>
+
+    <div class="card-scene" id="card-scene" onclick="flipCard()" role="button" tabindex="0" aria-label="Revelar pregunta">
+      <div class="card-flipper" id="card-flipper">
+
+        <div class="card-face card-front" id="card-front" data-icon="🌶️">
+          <span class="front-icon" id="front-icon">🌶️</span>
+          <span class="front-label">Tocá para revelar</span>
+        </div>
+
+        <div class="card-face card-back">
+          <div class="q-badge" id="q-type">PREGUNTA</div>
+          <div class="q-text"  id="q-text">Cargando...</div>
+          <div class="q-answer" id="q-answer"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="game-controls">
+      <button class="btn-main" onclick="nextCard()">Siguiente &nbsp;→</button>
+      <button class="btn-sec"  onclick="shuffleAll()">🔀 Mezclar</button>
+      <button class="btn-sec"  onclick="showScreen('categories')">⬡ Categorías</button>
+    </div>
+
+    <p class="game-tip">Tocá la carta para revelarla · Flecha derecha para la siguiente</p>
+  </div>
+</section>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   QUESTION BANK
+═══════════════════════════════════════════════════════════ */
+const DB = {
+
+  picantes: [
+    { q: "¿Con quién de los presentes tendrías una cita secreta si nadie se enterara?" },
+    { q: "¿Cuál fue la mentira más grande que dijiste para seducir a alguien?" },
+    { q: "¿Alguna vez coqueteaste con alguien que ya tenía pareja? ¿Cómo terminó?" },
+    { q: "¿Cuál es la app de citas que usaste o tenés escondida en alguna carpeta del celu?" },
+    { q: "¿Cuál fue el lugar más raro o insólito donde besaste a alguien?" },
+    { q: "¿Cuál es la fantasía más loca que tuviste y nunca le contaste a nadie?" },
+    { q: "¿Alguna vez espiaste el celular de tu pareja o de alguien que te gustaba?" },
+    { q: "Si tuvieras que elegir a alguien del grupo para casarte mañana, ¿a quién elegís?" },
+    { q: "¿Cuál fue el mensaje más vergonzoso que mandaste por error a la persona equivocada?" },
+    { q: "¿Alguna vez le dijiste 'te quiero' sin sentirlo de verdad? ¿Por qué?" },
+    { q: "¿Cuál es el nombre del ex/la ex que todavía googleás de vez en cuando?" },
+    { q: "¿Alguna vez saliste con alguien solo por el físico y resultó ser un desastre total?" },
+    { q: "¿Cuánto tiempo máximo podrías estar sin tener sexo por elección propia?" },
+    { q: "¿Alguna vez tuviste celos de un amigo/a de tu pareja y no lo reconociste?" },
+    { q: "¿Cuál es la cosa más rara que alguien te pidió en una primera cita?" },
+    { q: "¿Con qué famoso/a fantasearías sin decírselo jamás a nadie?" },
+    { q: "Si pudieras leer la mente de alguien acá por 60 segundos, ¿a quién elegirías?" },
+    { q: "¿Alguna vez le contaste a un amigo/a cosas íntimas de tu pareja?" },
+    { q: "¿Cuál fue tu acción más desesperada buscando atención de alguien que te gustaba?" },
+    { q: "¿Cuál fue la razón más ridícula por la que cortaste o te cortaron?" },
+    { q: "¿Alguna vez hiciste ghosting a alguien que no lo merecía? Contá la historia." },
+    { q: "¿Tenés guardado en el celu el número de alguien con un nombre en código?" },
+    { q: "¿Cuál fue el cumplido más raro que recibiste y de quién?" },
+    { q: "¿Alguna vez fingiste no tener señal para no contestar el teléfono?" },
+    { q: "¿Qué cosa de tu ex extrañás aunque no quieras reconocerlo?" },
+    { q: "¿Alguna vez tuviste un crush secreto con alguien del trabajo o la facultad?" },
+    { q: "¿Cuál es la señal de alarma más importante que ignoraste en una relación?" },
+    { q: "Si pudieras revisar el historial de búsqueda de alguien acá, ¿de quién sería?" },
+    { q: "¿Cuál es la cosa más insólita que hiciste para impresionar a alguien?" },
+    { q: "¿Alguna vez terminaste con alguien vía mensaje? ¿O te hicieron eso a vos?" },
+    { q: "¿Cuántos 'amigos' tenés en el teléfono que en realidad son potenciales citas?" },
+    { q: "¿Cuál fue la vez que más te arrepentiste de haber ido a una cita?" },
+    { q: "¿Alguna vez usaste a alguien para olvidarte de otra persona?" },
+    { q: "¿Cuál es lo más cringe que pusiste en tu bio de Tinder o Instagram alguna vez?" },
+    { q: "¿Cuánto tiempo llevas sin tener una cita romántica real?" },
+    { q: "¿Mandaste alguna foto comprometedora que después lamentaste haber mandado?" },
+    { q: "¿Cuál sería la situación ideal para confesar que te gusta alguien del grupo?" },
+    { q: "¿Qué harías si descubrís que alguien acá te tiene de crush secreto?" },
+    { q: "¿Cuál fue el momento más incómodo de un beso con alguien?" },
+    { q: "¿Cuál fue tu peor cita y qué fue exactamente lo que la arruinó?" },
+    { q: "¿Quién fue el primero que te rompió el corazón y qué aprendiste?" },
+    { q: "¿Alguna vez hiciste algo para provocar celos a propósito?" },
+    { q: "¿Cuál es el tipo de persona que sabes que no te conviene pero igual te atrae?" },
+    { q: "¿Qué es lo más atrevido que haría alguien en el grupo si tuviera el día libre?" },
+    { q: "Si pudieras borrar de la memoria una sola noche de tu vida sentimental, ¿cuál sería?" },
+  ],
+
+  previa: [
+    { q: "¿Cuál es tu ritual obligatorio antes de salir de noche?" },
+    { q: "¿A qué hora estás en tu pico de energía cuando salís?" },
+    { q: "¿Con quién del grupo terminás peleado/a después de tomar?" },
+    { q: "¿Cuál es la canción que sí o sí pedís cuando ya estás tomado/a?" },
+    { q: "¿Cuál fue la salida que quedó en la historia del grupo?" },
+    { q: "¿Sos del team 'salgo temprano' o 'llego cuando el lugar ya está lleno'?" },
+    { q: "¿Cuál es la excusa que usás para escaparte de una previa que está muerta?" },
+    { q: "Si pudieras teleportarte ahora mismo a una ciudad para salir, ¿a cuál irías?" },
+    { q: "¿Cuál es el peor lugar donde terminaste una noche de salida?" },
+    { q: "¿Cuántas veces dijiste 'esta semana no salgo' y mentiste?" },
+    { q: "¿Quién del grupo es el que termina bailando solo en el centro de la pista?" },
+    { q: "¿A qué hora de la madrugada empezás a hablar de las cosas más profundas de tu vida?" },
+    { q: "¿Cuál es el snack obligatorio de previa para vos?" },
+    { q: "¿Cuál fue la noche que dijiste 'ya no salgo más' y obviamente seguiste saliendo?" },
+    { q: "¿Cuánto tardás en decidir qué ponerte? ¿Y por qué siempre tardás más de lo planeado?" },
+    { q: "¿Cuál fue la previa que parecía que iba a ser aburrida y terminó siendo épica?" },
+    { q: "¿Cuál es la bebida que juraste nunca volver a tomar después de una mala experiencia?" },
+    { q: "¿A qué hora decís 'me voy' y en realidad te quedás dos horas más?" },
+    { q: "¿Cuántas fotos sacás en una noche y cuántas subirías a historias realmente?" },
+    { q: "¿Quién del grupo siempre arruina los planes con alguna excusa de último momento?" },
+    { q: "¿Cuál es el Uber más memorable que tomaste de regreso a casa?" },
+    { q: "¿Cuánto gastás de más cuando estás tomado/a comparado con tu presupuesto original?" },
+    { q: "Si esta noche salieras, ¿cómo querés que termine exactamente?" },
+    { q: "¿Cuál es el lugar de tu ciudad donde siempre terminan las salidas?" },
+    { q: "¿Quién del grupo da el mejor discurso cuando está borracho/a?" },
+    { q: "¿Cuál es tu talento oculto que solo aparece cuando tomaste?" },
+    { q: "¿Qué comida pedís de madrugada sí o sí después de salir?" },
+    { q: "Si hoy fuera la última previa de tu vida, ¿qué harías diferente?" },
+    { q: "¿Cuál es el juego de la previa que siempre termina en discusión o drama?" },
+    { q: "¿Cuántas horas dormís después de una buena salida?" },
+    { q: "¿Cuál fue la vez que menos plata tenías y mejor la pasaste saliendo?" },
+    { q: "¿Cuál es la frase que repetís siempre cuando estás de previa?" },
+    { q: "¿En qué momento de la noche te das cuenta de que fue demasiado?" },
+    { q: "¿Cuál es la canción que si suena todos saben que la noche se prendió?" },
+    { q: "¿Qué cosa hacés de previa que jamás admitiría delante de tus compañeros de trabajo?" },
+    { q: "¿Cuántos grupos de WhatsApp de salida tenés activos en este momento?" },
+    { q: "¿Cuál fue el plan que organizaste con meses de anticipación y que finalmente se canceló?" },
+    { q: "¿Cuál es la señal definitiva de que ya es hora de irse del boliche?" },
+    { q: "¿Alguna vez pediste un Uber y te quedaste dormido/a antes de llegar a destino?" },
+    { q: "¿Cuál es el plan B que siempre está disponible cuando todo falla?" },
+    { q: "¿Qué persona del grupo nunca falla cuando hay que salir aunque sea tarde?" },
+    { q: "¿Cuántas veces mandaste un mensaje en grupo de 'llego en 5' y llegaste en 45?" },
+  ],
+
+  inofensivas: [
+    { q: "¿Cuál es tu película favorita que no te animás a decir en voz alta por miedo al juicio?" },
+    { q: "¿Si pudieras ser cualquier animal, cuál serías y por qué ese específicamente?" },
+    { q: "¿Cuál es el superpoder más inútil que elegirías si supieras que no vas a tener uno útil?" },
+    { q: "¿Cuál fue el libro que dijiste que leíste pero claramente no leíste?" },
+    { q: "¿Qué canción te transporta instantáneamente a tu infancia?" },
+    { q: "¿Cuál es el hobby que querés empezar 'cuando tengas tiempo' y que nunca empezás?" },
+    { q: "¿Cuál es el plato que cocinás bien y cuál es el desastre culinario de tu vida?" },
+    { q: "Si tuvieras que mudarte a otro país hoy mismo, ¿a cuál irías sin pensarlo dos veces?" },
+    { q: "¿Cuál es la profesión que hubieras elegido si el dinero no importara?" },
+    { q: "¿Tenés un talento oculto que muy poca gente conoce? Contalo." },
+    { q: "¿Cuál es la cosa más rara de tu rutina diaria?" },
+    { q: "¿Qué harías con 24 horas completamente libres sin ninguna obligación?" },
+    { q: "¿Cuál es la serie o película que recomendás siempre pero nadie te escucha?" },
+    { q: "¿Cuál es el misterio o pregunta del universo que más te desvela?" },
+    { q: "¿Tenés alguna fobia que te resulta vergonzosa o directamente graciosa?" },
+    { q: "¿Cuál es la persona de la historia que más te gustaría conocer y qué le preguntarías?" },
+    { q: "¿Qué aprendiste solo/a en cuarentena o en un momento de aburrimiento extremo?" },
+    { q: "¿Cuál es el olor que te da más nostalgia?" },
+    { q: "¿Qué harías si encontrás un sobre con $50.000 en la calle?" },
+    { q: "¿Cuál es el lugar de tu ciudad que sentís que nadie más conoce?" },
+    { q: "¿Cuál es la habilidad que admirás en los demás pero que vos no tenés?" },
+    { q: "¿Cuál es la última foto de tu galería y qué historia tiene?" },
+    { q: "¿Preferirías poder volar o ser invisible? ¿Para qué lo usarías exactamente?" },
+    { q: "¿Cuál es la palabra en otro idioma que te encanta cómo suena?" },
+    { q: "¿Cuál es el plan de fin de semana ideal para vos?" },
+    { q: "¿Qué es lo primero que hacés cuando te despertás y lo último antes de dormir?" },
+    { q: "Si pudieras aprender cualquier habilidad en un solo día, ¿cuál elegiría?" },
+    { q: "¿Cuál fue la experiencia más extraña que tuviste viajando?" },
+    { q: "¿Cuál es la norma social que genuinamente no entendés por qué existe?" },
+    { q: "¿Qué cosa de cuando eras chico/a te gustaría poder recuperar ahora?" },
+    { q: "¿Cuál es el ruido que más te molesta en el mundo?" },
+    { q: "¿Cuál es el consejo que le darías a tu yo de 10 años más joven?" },
+    { q: "¿Cuál es la manía tuya que nadie entiende pero que para vos tiene todo el sentido?" },
+    { q: "¿Cuál fue el regalo más original que diste o recibiste?" },
+    { q: "¿Cuál es la obra de arte, canción o libro que te cambió la perspectiva?" },
+    { q: "¿Qué cosa hacés cuando estás solo/a que no haría delante de nadie?" },
+    { q: "¿Cuál es tu mayor logro personal que no tiene nada que ver con el trabajo o el estudio?" },
+    { q: "Si pudieras vivir en cualquier época histórica, ¿cuál elegirías y en qué rol?" },
+    { q: "¿Cuál es la cosa que comprás siempre 'para después' y que nunca usás?" },
+    { q: "¿Cuál es la decisión de la que estás más orgulloso/a en los últimos años?" },
+    { q: "¿Qué haría más feliz a tu yo de 8 años de lo que hacés hoy?" },
+    { q: "¿Cuál es el lugar en el mundo donde sentiste que realmente encajabas?" },
+  ],
+
+  conocen: [
+    { q: "¿Cuál es el plato favorito de la persona a tu izquierda?" },
+    { q: "¿Qué canción describe perfectamente el estado de vida del jugador de tu elección?" },
+    { q: "¿A quién del grupo le gustaría más vivir completamente solo/a?" },
+    { q: "¿Cuál es el mayor miedo de la persona que tenés justo en frente?" },
+    { q: "¿Quién del grupo tiene el cuarto más desordenado?" },
+    { q: "¿Qué carrera o trabajo elegiría alguien si tuviera que empezar de cero hoy?" },
+    { q: "¿Quién es el primero en dormirse en un plan tranquilo?" },
+    { q: "¿Cuál es la manía más reconocible de alguien del grupo?" },
+    { q: "¿A quién le resultaría más difícil estar sin internet por una semana entera?" },
+    { q: "¿Quién del grupo llora más fácil con las películas?" },
+    { q: "¿Cuál es la frase que alguien del grupo repite siempre sin darse cuenta?" },
+    { q: "¿A quién del grupo le gustaría más vivir en el campo y a quién en la ciudad?" },
+    { q: "¿Quién del grupo sería el peor cocinero/a en una situación de supervivencia?" },
+    { q: "¿Quién es el que siempre llega tarde pase lo que pase?" },
+    { q: "¿Cuál es el hobby secreto que creés que tiene alguien del grupo?" },
+    { q: "¿Quién del grupo cambió más desde que se conocen?" },
+    { q: "¿Quién es el más terco/a del grupo? ¿Y por qué?" },
+    { q: "¿Cuál fue el momento más gracioso que vivieron todos juntos?" },
+    { q: "¿Quién del grupo se enojaría más si le cancelan planes de último momento?" },
+    { q: "¿A quién del grupo le resulta más difícil pedir perdón?" },
+    { q: "¿Quién del grupo tiene más potencial para ser famoso/a? ¿En qué campo?" },
+    { q: "¿Cuál es la historia del grupo que se cuenta siempre que se juntan?" },
+    { q: "¿A quién del grupo le costaría más hacer una dieta?" },
+    { q: "¿Quién es el que siempre tiene el mejor consejo cuando estás mal?" },
+    { q: "¿Quién del grupo es el más aventurero/a?" },
+    { q: "¿A quién le molestaría más que le revisen el celular sin permiso?" },
+    { q: "¿Quién es el que recuerda todos los cumpleaños sin necesidad de Facebook?" },
+    { q: "¿Quién del grupo es el más empático cuando alguien está pasándola mal?" },
+    { q: "¿A quién del grupo ves en 10 años totalmente diferente a como es ahora?" },
+    { q: "¿Quién del grupo es el que nunca pierde la calma pase lo que pase?" },
+    { q: "¿Quién del grupo es el que más se preocupa por la opinión ajena?" },
+    { q: "¿A quién le resultaría más difícil vivir lejos de su familia?" },
+    { q: "¿Quién del grupo sería el mejor/a padre o madre?" },
+    { q: "¿Cuál es el recuerdo que todos en el grupo tienen en común?" },
+    { q: "¿Quién del grupo tiene la historia de vida más cinematográfica?" },
+    { q: "¿Cuál es el sueño de vida de alguien del grupo que el resto quizás no sabe?" },
+    { q: "¿Quién del grupo es el que más extrañarías si se fuera a vivir al exterior?" },
+    { q: "¿Quién del grupo se va a casar primero y quién será el último?" },
+    { q: "¿A quién del grupo le cuesta más decir 'no' ante un pedido?" },
+    { q: "¿Quién del grupo es el que más cambió para bien en los últimos años?" },
+  ],
+
+  ingenieros: [
+    // ── DEV / SOFTWARE ──────────────────────────────────────────
+    { q: "¿Cuántas pestañas tenés abiertas ahora mismo? Sé honesto/a.", type: "CONFESIÓN" },
+    { q: "¿Tabs o spaces? Defendé tu respuesta como si tu trabajo dependiera de ello.", type: "DEBATE" },
+    { q: "¿Cuántos TODOs pusiste en el código que juraste arreglar 'después' y siguen ahí?", type: "CONFESIÓN" },
+    { q: "¿Cuál es el error que te hizo perder horas y que al final era un typo?", type: "HISTORIA" },
+    { q: "¿Cuántas veces reiniciaste todo antes de darte cuenta que era un punto y coma?", type: "CONFESIÓN" },
+    { q: "¿Cuál es el framework que odiarías tener que usar en un proyecto de dos años?", type: "DEBATE" },
+    { q: "¿En qué momento de tu carrera copiaste código de Stack Overflow sin entenderlo?", type: "CONFESIÓN" },
+    { q: "¿Cuál es el bug más ridículo que tardaste días en resolver y luego resultó ser obvio?", type: "HISTORIA" },
+    { q: "¿Cuál es la estimación más irreal que diste? ('son 2 horas') ¿Cuánto tardó realmente?", type: "CONFESIÓN" },
+    { q: "¿Alguna vez pusiste en producción algo un viernes a las 6pm? Contá las consecuencias.", type: "HISTORIA" },
+    { q: "¿Git rebase o Git merge? Explicalo como si fuera una cuestión de principios.", type: "DEBATE" },
+    { q: "¿Cuántas veces instalaste todo de cero porque 'era más fácil que debuggear'?", type: "CONFESIÓN" },
+    { q: "¿Cuál fue el deploy más desastroso que hiciste o presenciaste?", type: "HISTORIA" },
+    { q: "¿Cuál es el lenguaje o tecnología que pusiste en el CV sin dominarlo del todo?", type: "CONFESIÓN" },
+    { q: "Dark mode o light mode: ¿cuál dice más del carácter de una persona?", type: "DEBATE" },
+    { q: "¿Cuál fue la vez que un junior te enseñó algo que vos no sabías?", type: "HISTORIA" },
+    { q: "¿Cuál es el código que funciona pero que no entendés por qué funciona?", type: "CONFESIÓN" },
+    { q: "¿Alguna vez le echaste la culpa al hardware o al SO cuando era tu código?", type: "CONFESIÓN" },
+    { q: "¿Qué herramienta de IA te da más miedo que te reemplace en el futuro?", type: "DEBATE" },
+    { q: "¿Cuál es el lenguaje de programación que más respetás aunque nunca lo vayas a usar?", type: "DEBATE" },
+    { q: "Si pudieras eliminar una tecnología de la web para siempre, ¿cuál sería y por qué?", type: "DEBATE" },
+    { q: "¿Cuál fue la excusa técnica más elaborada que inventaste para justificar un error tuyo?", type: "CONFESIÓN" },
+
+    // ── ANÁLISIS MATEMÁTICO ──────────────────────────────────────
+    { q: "¿Cuál es la diferencia entre continuidad y diferenciabilidad? ¿Se puede tener una sin la otra?", type: "TÉCNICA", a: "Sí. Una función puede ser continua pero no diferenciable (ej: |x| en x=0). Diferenciable implica continua, pero no al revés." },
+    { q: "¿Qué significa geométricamente que la derivada de una función sea cero en un punto?", type: "TÉCNICA", a: "La tangente a la curva es horizontal en ese punto. Puede ser un máximo, mínimo o punto de inflexión." },
+    { q: "¿Podés explicar el Teorema Fundamental del Cálculo en una oración sin fórmulas?", type: "TÉCNICA", a: "La derivación y la integración son operaciones inversas: integrar y luego derivar devuelve la función original." },
+    { q: "¿Cuál es la diferencia conceptual entre una serie convergente y una divergente?", type: "TÉCNICA", a: "Una serie converge si la suma de sus infinitos términos da un número finito. Diverge si crece sin límite o no se estabiliza." },
+    { q: "¿Por qué e^(iπ) + 1 = 0 se considera la ecuación más bella de la matemática? ¿Estás de acuerdo?", type: "DEBATE" },
+    { q: "¿Qué es una transformada de Laplace y para qué sirve en ingeniería?", type: "TÉCNICA", a: "Transforma una función del dominio del tiempo al dominio de la frecuencia compleja s. Simplifica ecuaciones diferenciales convirtiéndolas en algebraicas." },
+    { q: "¿Cuál es la diferencia entre una derivada parcial y una derivada total?", type: "TÉCNICA", a: "La derivada parcial varía solo una variable manteniendo el resto fijo. La derivada total considera cómo todas las variables cambian simultáneamente." },
+    { q: "Si una función tiene derivada segunda positiva en un punto, ¿qué indica eso geométricamente?", type: "TÉCNICA", a: "La función es cóncava hacia arriba en ese punto (como una taza boca arriba)." },
+    { q: "¿Qué es una serie de Taylor y qué problema resuelve en la práctica?", type: "TÉCNICA", a: "Aproxima funciones complejas con polinomios. En ingeniería permite linealizar funciones no lineales cerca de un punto de operación." },
+    { q: "¿Es posible que una integral definida sea negativa? ¿Qué significaría físicamente?", type: "DEBATE", a: "Sí. Si la función es negativa en el intervalo, el área está bajo el eje x. En física puede significar trabajo negativo o flujo inverso." },
+    { q: "¿Qué es el gradiente de una función escalar y en qué dirección apunta?", type: "TÉCNICA", a: "Es un vector que apunta en la dirección de máximo aumento de la función. Su módulo indica la tasa de cambio máxima." },
+
+    // ── FÍSICA ───────────────────────────────────────────────────
+    { q: "Si un objeto cae en el vacío y otro en el aire desde la misma altura, ¿llegan al mismo tiempo? ¿Por qué en la realidad no?", type: "TÉCNICA", a: "En el vacío sí (Galileo). En el aire, la resistencia aerodinámica depende del área y masa, por eso llegan en tiempos distintos." },
+    { q: "¿Cuál es la diferencia entre masa y peso? ¿Por qué se confunden tanto?", type: "TÉCNICA", a: "La masa es una propiedad intrínseca (kg). El peso es la fuerza gravitacional sobre esa masa (N = kg·m/s²). Se confunden porque en la Tierra g ≈ 9,81 m/s² es constante." },
+    { q: "¿Por qué un cohete puede acelerar en el vacío del espacio si no tiene nada contra qué empujar?", type: "TÉCNICA", a: "Por conservación del momento lineal: al expulsar masa (gases) hacia atrás a alta velocidad, el cohete es empujado hacia adelante. No necesita medio externo." },
+    { q: "¿Cuál es la diferencia entre un sistema de referencia inercial y uno no inercial?", type: "TÉCNICA", a: "Inercial: sin aceleración, las leyes de Newton aplican directamente. No inercial: acelerado, aparecen fuerzas ficticias como la centrífuga o Coriolis." },
+    { q: "¿Qué es el efecto Coriolis y por qué importa en ingeniería?", type: "TÉCNICA", a: "Es una fuerza aparente en sistemas rotantes como la Tierra. Afecta trayectorias de proyectiles, vientos, corrientes oceánicas y giroscopios." },
+    { q: "¿Por qué un giroscopio resiste el cambio de orientación? ¿Qué principio físico lo explica?", type: "TÉCNICA", a: "Conservación del momento angular. Para cambiar el eje de rotación se necesita un torque externo; sin él, el eje mantiene su dirección." },
+    { q: "¿Cuál es la diferencia entre trabajo y potencia en física? ¿Cuál es más útil para diseñar un motor?", type: "DEBATE", a: "Trabajo = fuerza × desplazamiento (Joules). Potencia = trabajo/tiempo (Watts). Para un motor importa más la potencia: indica cuánto trabajo hace por segundo." },
+    { q: "¿Por qué un puente colgante puede soportar más peso que un puente recto del mismo material?", type: "DEBATE" },
+    { q: "Si pudieras violar una sola ley de la física para diseñar algo, ¿cuál elegirías y qué construirías?", type: "DEBATE" },
+
+    // ── QUÍMICA ──────────────────────────────────────────────────
+    { q: "¿Cuál es la diferencia entre una reacción exotérmica y una endotérmica? Dá un ejemplo cotidiano de cada una.", type: "TÉCNICA", a: "Exotérmica: libera calor (combustión, oxidación). Endotérmica: absorbe calor (disolución de sal, fotosíntesis)." },
+    { q: "¿Por qué el agua es un solvente universal? ¿Qué tiene de especial su molécula?", type: "TÉCNICA", a: "Su estructura polar (dipolo permanente) le permite interactuar con iones y otras moléculas polares. Los enlaces de hidrógeno refuerzan esta capacidad." },
+    { q: "¿Qué es el pH y por qué la escala va de 0 a 14?", type: "TÉCNICA", a: "pH = -log[H⁺]. Va de 0 a 14 porque la constante de disociación del agua a 25°C da una concentración máxima de H⁺ de 1 mol/L (pH 0) y mínima de 10⁻¹⁴ (pH 14)." },
+    { q: "¿Cuál es la diferencia entre un enlace iónico, covalente y metálico?", type: "TÉCNICA", a: "Iónico: transferencia de electrones entre metales y no-metales. Covalente: electrones compartidos entre no-metales. Metálico: electrones libres en una red de cationes metálicos." },
+    { q: "¿Por qué el hielo flota en el agua? ¿Qué implicancia tiene esto para la vida en la Tierra?", type: "TÉCNICA", a: "El hielo tiene menor densidad que el agua líquida por su estructura cristalina hexagonal. Esto permite que los lagos se congelen desde arriba, protegiendo la vida debajo." },
+    { q: "¿Qué es la entalpía y en qué se diferencia de la energía interna?", type: "TÉCNICA", a: "Entalpía H = U + pV. Incluye el trabajo de expansión contra la presión externa. Es más útil en reacciones a presión constante (casi todo en química real)." },
+    { q: "¿Por qué algunos materiales son conductores eléctricos y otros aislantes? ¿Qué determina eso a nivel atómico?", type: "TÉCNICA", a: "La estructura de bandas de energía. Los conductores tienen banda de valencia y conducción solapadas. Los aislantes tienen una banda prohibida (gap) grande entre ellas." },
+    { q: "¿Cuál es el elemento más abundante en el universo y cuál en la corteza terrestre?", type: "TÉCNICA", a: "En el universo: hidrógeno. En la corteza terrestre: oxígeno (≈46% en masa)." },
+    { q: "¿Es posible tener una reacción química 100% eficiente? ¿Por qué no?", type: "DEBATE", a: "No. La Segunda Ley de la Termodinámica establece que siempre hay aumento de entropía. Parte de la energía se disipa como calor no aprovechable." },
+
+    // ── ELECTROMAGNETISMO ────────────────────────────────────────
+    { q: "¿Cuál es la diferencia entre corriente continua (CC) y corriente alterna (CA)? ¿Por qué distribuimos energía en CA?", type: "TÉCNICA", a: "CC: flujo constante de electrones en una dirección. CA: flujo que cambia de dirección periódicamente. Se usa CA porque es más fácil transformar tensiones con transformadores." },
+    { q: "¿Qué dice la Ley de Faraday y cómo se usa en la generación de electricidad?", type: "TÉCNICA", a: "Un campo magnético variable en el tiempo induce una fuerza electromotriz (fem) en un conductor. Los generadores la usan: el movimiento mecánico varía el flujo magnético y genera corriente." },
+    { q: "¿Qué es la impedancia y en qué se diferencia de la resistencia?", type: "TÉCNICA", a: "La impedancia Z es la oposición total al flujo de corriente alterna, incluyendo resistencia (R), reactancia inductiva (ωL) y capacitiva (1/ωC). La resistencia solo aplica en CC." },
+    { q: "¿Por qué los cables de alta tensión se transmiten a miles de voltios y no a 220V directamente?", type: "TÉCNICA", a: "A mayor voltaje, menor corriente para la misma potencia (P=VI). Menor corriente implica menores pérdidas por efecto Joule (P=I²R). Se reducen enormemente las pérdidas en líneas largas." },
+    { q: "¿Qué es la capacitancia y qué hace un capacitor en un circuito de CA?", type: "TÉCNICA", a: "Capacitancia es la capacidad de almacenar carga eléctrica. En CA, el capacitor bloquea CC y deja pasar CA, introduciendo un desfasaje de -90° entre tensión y corriente." },
+    { q: "¿Cuál es la diferencia entre un campo eléctrico y un campo magnético?", type: "TÉCNICA", a: "El campo eléctrico es generado por cargas estáticas y actúa sobre cargas. El campo magnético es generado por cargas en movimiento (corriente) y actúa solo sobre cargas en movimiento." },
+    { q: "¿Por qué una onda electromagnética puede viajar en el vacío pero una onda de sonido no?", type: "TÉCNICA", a: "Las ondas EM son perturbaciones de campos eléctricos y magnéticos que se regeneran mutuamente sin necesitar materia. El sonido requiere un medio material para propagar la presión." },
+    { q: "¿Qué tiene que ver la Ley de Gauss con los rayos y los pararrayos?", type: "DEBATE", a: "Las cargas eléctricas se concentran en superficies con mayor curvatura (puntas). El pararrayos crea un campo muy intenso en su punta que ioniza el aire y atrae los rayos hacia él." },
+    { q: "¿Podría existir un monopolo magnético? ¿Qué implicaría para la física si se descubriera?", type: "DEBATE" },
+
+    // ── MECÁNICA DE FLUIDOS ───────────────────────────────────────
+    { q: "¿Qué dice el principio de Bernoulli y cómo explica que un avión vuele?", type: "TÉCNICA", a: "Donde la velocidad del fluido aumenta, la presión disminuye. El ala genera más velocidad sobre ella que debajo, creando una diferencia de presión (sustentación) hacia arriba." },
+    { q: "¿Cuál es la diferencia entre flujo laminar y turbulento? ¿Cuál es más eficiente energéticamente?", type: "TÉCNICA", a: "Laminar: capas paralelas ordenadas, sin mezcla. Turbulento: caótico, con vórtices. El laminar es más eficiente en tuberías, pero el turbulento mejora la mezcla en reactores y la refrigeración." },
+    { q: "¿Qué es el número de Reynolds y para qué sirve?", type: "TÉCNICA", a: "Re = ρVD/μ. Es un número adimensional que indica si un flujo será laminar (Re<2300) o turbulento (Re>4000). Permite escalar experimentos de modelos a sistemas reales." },
+    { q: "¿Por qué un barco de acero flota si el acero es más denso que el agua?", type: "TÉCNICA", a: "El principio de Arquímedes: el empuje es igual al peso del fluido desplazado. El barco desplaza un volumen de agua cuyo peso supera el peso total del barco, por su forma hueca." },
+    { q: "¿Qué es la viscosidad y por qué el aceite es más viscoso que el agua?", type: "TÉCNICA", a: "Es la resistencia interna de un fluido al flujo. El aceite tiene cadenas moleculares largas con más fuerzas intermoleculares, lo que genera mayor fricción interna." },
+    { q: "¿Qué es el golpe de ariete y por qué puede romper cañerías?", type: "TÉCNICA", a: "Es un pico de presión causado por el cierre brusco de una válvula en una tubería. La inercia del fluido genera una onda de presión que puede superar enormemente la presión de diseño." },
+    { q: "¿Por qué las pelotas de golf tienen hoyuelos? ¿Qué tiene que ver la mecánica de fluidos?", type: "TÉCNICA", a: "Los hoyuelos inducen turbulencia en la capa límite, lo que reduce la zona de separación del flujo en la parte trasera y disminuye la resistencia aerodinámica (paradoja de la drag turbulenta)." },
+    { q: "¿Qué es la cavitación y por qué destruye las hélices de los barcos?", type: "TÉCNICA", a: "Cuando la presión local cae por debajo de la presión de vapor, el líquido se evapora formando burbujas. Al colapsar, generan ondas de choque microscópicas que erosionan el metal." },
+    { q: "¿Por qué los aviones vuelan más alto para ahorrar combustible?", type: "DEBATE", a: "A mayor altitud, la densidad del aire es menor. Hay menos resistencia aerodinámica y los motores trabajan en condiciones de temperatura más favorables. El ahorro supera el costo de ascender." },
+
+    // ── TERMODINÁMICA ────────────────────────────────────────────
+    { q: "¿Cuáles son las cuatro leyes de la termodinámica en términos simples?", type: "TÉCNICA", a: "0: Si A=B y B=C en equilibrio térmico, entonces A=C. 1: La energía no se crea ni se destruye. 2: La entropía siempre aumenta. 3: No se puede llegar al cero absoluto." },
+    { q: "¿Por qué un motor térmico nunca puede ser 100% eficiente?", type: "TÉCNICA", a: "Segunda Ley: parte del calor siempre se cede al foco frío. La eficiencia máxima teórica es la de Carnot: η = 1 - T_fría/T_caliente (en Kelvin)." },
+    { q: "¿Qué es la entropía en términos simples y por qué siempre aumenta?", type: "TÉCNICA", a: "Es la medida del desorden de un sistema. Aumenta porque hay muchos más estados desordenados que ordenados: estadísticamente, los sistemas tienden espontáneamente al desorden." },
+    { q: "¿Cuál es la diferencia entre un proceso isotérmico, isobárico, isocórico y adiabático?", type: "TÉCNICA", a: "Isotérmico: T constante. Isobárico: P constante. Isocórico: V constante. Adiabático: sin intercambio de calor con el entorno (Q=0)." },
+    { q: "¿Cómo funciona un ciclo de refrigeración y qué tiene que ver con la termodinámica?", type: "TÉCNICA", a: "Un refrigerante se evapora absorbiendo calor del espacio frío y se condensa liberando calor al exterior. Usa trabajo mecánico para 'bombear' calor del frío al caliente, invirtiendo el flujo natural." },
+    { q: "¿Es termodinámicamente posible construir una máquina que produzca más energía de la que consume?", type: "DEBATE", a: "No. Viola la Primera Ley (conservación de energía). El movimiento perpetuo de primera especie es imposible. La Segunda Ley además establece que parte de la energía siempre se degrada." },
+    { q: "¿Por qué el café se enfría más rápido en una taza ancha que en una angosta?", type: "DEBATE", a: "Mayor área superficial en contacto con el aire → mayor transferencia de calor por convección y radiación. La taza ancha tiene más superficie expuesta por volumen de líquido." },
+    { q: "¿Qué es la conducción, convección y radiación térmica? ¿Cuál domina en el espacio exterior?", type: "TÉCNICA", a: "Conducción: transferencia por contacto. Convección: por movimiento de fluido. Radiación: por ondas electromagnéticas. En el vacío del espacio solo existe la radiación." },
+
+    // ── POLÉMICAS / DEBATE INGENIERÍA ────────────────────────────
+    { q: "¿La energía nuclear debería ser parte de la solución al cambio climático o es demasiado riesgosa?", type: "DEBATE" },
+    { q: "¿La inteligencia artificial va a reemplazar a los ingenieros en los próximos 20 años?", type: "DEBATE" },
+    { q: "¿Es más valioso un ingeniero que sabe de todo superficialmente o uno que domina una sola área a fondo?", type: "DEBATE" },
+    { q: "¿El software open source es superior al propietario o son mundos que no se pueden comparar?", type: "DEBATE" },
+    { q: "¿Deberían los ingenieros tener más responsabilidad legal cuando sus sistemas fallan y causan daño?", type: "DEBATE" },
+    { q: "¿La exploración espacial privada (SpaceX, Blue Origin) es un avance o distrae recursos de problemas urgentes?", type: "DEBATE" },
+    { q: "¿Los autos eléctricos son realmente más sustentables si la electricidad que los carga viene del carbón?", type: "DEBATE" },
+    { q: "¿Deberíamos construir reactores de fusión nuclear o invertir ese dinero en mejorar las renovables existentes?", type: "DEBATE" },
+    { q: "¿La ingeniería tiene una deuda ética con los lugares donde se extraen los minerales de los semiconductores?", type: "DEBATE" },
+    { q: "¿El modelo de 'move fast and break things' en software es aceptable o irresponsable en sistemas críticos?", type: "DEBATE" },
+    { q: "¿Qué haría vos diferente si pudieras rediseñar internet desde cero hoy?", type: "DEBATE" },
+    { q: "¿La automatización industrial genera más empleos de los que destruye o es un mito para justificarla?", type: "DEBATE" },
+  ],
+
+  cultura: [
+    { q: "¿Cuántos países hay en el mundo actualmente?",             a: "195 países reconocidos por la ONU" },
+    { q: "¿Qué país tiene más zonas horarias?",                     a: "Francia (con sus territorios de ultramar: 12 zonas horarias)" },
+    { q: "¿Cuál es el animal más mortífero del mundo para los humanos?", a: "El mosquito (transmite enfermedades que matan millones por año)" },
+    { q: "¿En qué año cayó el Muro de Berlín?",                     a: "1989 (9 de noviembre)" },
+    { q: "¿Cuál es el río más largo del mundo?",                    a: "El Nilo (aunque hay debate con el Amazonas según la medición)" },
+    { q: "¿Cuántos huesos tiene el cuerpo humano adulto?",          a: "206 huesos" },
+    { q: "¿En qué año llegó el hombre a la Luna por primera vez?",  a: "1969 — Apollo 11, 20 de julio" },
+    { q: "¿Qué elemento químico tiene el símbolo Au?",              a: "El oro (del latín Aurum)" },
+    { q: "¿Cuántos planetas tiene el sistema solar?",               a: "8 planetas (Plutón fue reclasificado en 2006)" },
+    { q: "¿Cuál es la capital de Australia?",                       a: "Canberra (no Sydney ni Melbourne)" },
+    { q: "¿Quién pintó la Capilla Sixtina?",                        a: "Miguel Ángel (1508–1512)" },
+    { q: "¿Cuánto tarda aproximadamente un año en Marte?",          a: "687 días terrestres" },
+    { q: "¿Cuál es el metal más abundante en la corteza terrestre?",a: "El aluminio" },
+    { q: "¿Quién escribió 'Cien años de soledad'?",                  a: "Gabriel García Márquez (1967)" },
+    { q: "¿Cuántas cuerdas tiene una guitarra clásica?",            a: "6 cuerdas" },
+    { q: "¿En qué continente está Egipto?",                         a: "África (aunque la Península del Sinaí es parte de Asia)" },
+    { q: "¿Cuál es la velocidad de la luz en kilómetros por segundo?", a: "Aproximadamente 299.792 km/s" },
+    { q: "¿Quién propuso la Teoría de la Relatividad?",             a: "Albert Einstein (especial en 1905, general en 1915)" },
+    { q: "¿Cuánto pesa el cerebro humano promedio?",                a: "Aproximadamente 1,4 kilos" },
+    { q: "¿Cuál es el océano más grande del mundo?",                a: "El Océano Pacífico" },
+    { q: "¿En qué país se originó el sushi tal como lo conocemos?", a: "Japón (adaptó el narezushi chino al siglo XIX)" },
+    { q: "¿Cuántas notas tiene la escala musical occidental?",      a: "12 notas (7 naturales + 5 alteradas)" },
+    { q: "¿Cuál es el país más pequeño del mundo?",                 a: "La Ciudad del Vaticano (0,44 km²)" },
+    { q: "¿Qué científica ganó el Nobel tanto en Física como en Química?", a: "Marie Curie (Física 1903, Química 1911)" },
+    { q: "¿Cuánto demora la luz del Sol en llegar a la Tierra?",    a: "Aproximadamente 8 minutos y 20 segundos" },
+    { q: "¿Cuál es el hueso más largo del cuerpo humano?",          a: "El fémur (hueso del muslo)" },
+    { q: "¿Quién fue el primer presidente de Estados Unidos?",      a: "George Washington (1789)" },
+    { q: "¿Cuántas lenguas oficiales tiene Suiza?",                 a: "4: alemán, francés, italiano y romanche" },
+    { q: "¿En qué año se fundó Apple?",                             a: "1976 (Jobs, Wozniak y Ronald Wayne)" },
+    { q: "¿Cuál es el gas más abundante en la atmósfera terrestre?",a: "El nitrógeno (78%)" },
+    { q: "¿Cuántas letras tiene el alfabeto español?",              a: "27 letras (incluye la ñ)" },
+    { q: "¿Cuál es la montaña más alta del mundo?",                 a: "El Monte Everest (8.848 m sobre el nivel del mar)" },
+    { q: "¿En qué año comenzó la Primera Guerra Mundial?",          a: "1914 (asesinato del archiduque Francisco Fernando)" },
+    { q: "¿Cuál es el animal terrestre más rápido?",                a: "El guepardo (hasta 120 km/h en distancias cortas)" },
+    { q: "¿Quién descubrió la penicilina?",                         a: "Alexander Fleming (1928, de forma accidental)" },
+    { q: "¿Cuántos cromosomas tiene una célula humana normal?",     a: "46 cromosomas (23 pares)" },
+    { q: "¿Cuál es el país con más habitantes del mundo?",          a: "India (superó a China en 2023)" },
+    { q: "¿En qué año se inventó la World Wide Web?",               a: "1989 (Tim Berners-Lee en el CERN)" },
+    { q: "¿Cuánto tiempo vive una abeja obrera en promedio?",       a: "Entre 4 y 6 semanas en verano" },
+    { q: "¿Cuántos litros de sangre tiene el cuerpo humano adulto?",a: "Entre 4,5 y 6 litros" },
+    { q: "¿En qué año cayó el Imperio Romano de Occidente?",        a: "476 d.C." },
+    { q: "¿Cuál es el instrumento musical más antiguo conocido?",   a: "La flauta de hueso (hace más de 60.000 años)" },
+    { q: "¿Cuál es el país mayor productor de café del mundo?",     a: "Brasil" },
+    { q: "¿Cuántos gramos tiene una onza troy (metales preciosos)?",a: "31,1 gramos" },
+    { q: "¿Cuál es la obra de teatro más representada de Shakespeare?", a: "Hamlet (también Macbeth y Romeo y Julieta son candidatos)" },
+    { q: "¿Cuántos millones de neuronas tiene el cerebro humano aproximadamente?", a: "Alrededor de 86.000 millones de neuronas" },
+  ],
+};
+
+/* ═══════════════════════════════════════════════════════════
+   CATEGORY CONFIG
+═══════════════════════════════════════════════════════════ */
+const CATS = {
+  picantes:    { icon: '🌶️', name: 'Picantes +18',        color: '#ff3d6e' },
+  previa:      { icon: '🍻', name: 'De Previa',           color: '#ffb300' },
+  inofensivas: { icon: '😇', name: 'Inofensivas',         color: '#00e676' },
+  conocen:     { icon: '💕', name: '¿Cuánto te conocen?', color: '#f06292' },
+  ingenieros:  { icon: '⚙️', name: 'Solo Ingenieros',     color: '#40c4ff' },
+  cultura:     { icon: '🌍', name: 'Cultura General',     color: '#ce93d8' },
+};
+
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let state = { cat: null, deck: [], idx: 0, flipped: false };
+
+/* ═══════════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function setColor(color) {
+  document.getElementById('screen-game').style.setProperty('--ac', color);
+  document.getElementById('game-glow').style.background = color;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GAME
+═══════════════════════════════════════════════════════════ */
+function startGame(cat) {
+  state.cat     = cat;
+  state.deck    = shuffle(DB[cat]);
+  state.idx     = 0;
+  state.flipped = false;
+
+  const cfg = CATS[cat];
+  setColor(cfg.color);
+
+  document.getElementById('game-pill').textContent          = cfg.icon + ' ' + cfg.name;
+  document.getElementById('front-icon').textContent         = cfg.icon;
+  document.getElementById('card-front').dataset.icon        = cfg.icon;
+  document.getElementById('card-flipper').classList.remove('is-flipped');
+
+  renderCard();
+  showScreen('game');
+}
+
+function renderCard() {
+  const card  = state.deck[state.idx];
+  const total = state.deck.length;
+
+  document.getElementById('game-counter').textContent      = (state.idx + 1) + ' / ' + total;
+  document.getElementById('progress-fill').style.width     = (state.idx / total * 100) + '%';
+  document.getElementById('q-type').textContent            = card.type || 'PREGUNTA';
+  document.getElementById('q-text').textContent            = card.q;
+
+  const ansEl = document.getElementById('q-answer');
+  if (card.a) {
+    ansEl.textContent   = '✓ ' + card.a;
+    ansEl.style.display = 'block';
+  } else {
+    ansEl.style.display = 'none';
+  }
+}
+
+function flipCard() {
+  state.flipped = !state.flipped;
+  document.getElementById('card-flipper').classList.toggle('is-flipped', state.flipped);
+}
+
+function nextCard() {
+  const flipper = document.getElementById('card-flipper');
+  const scene   = document.getElementById('card-scene');
+
+  const advance = () => {
+    state.idx = (state.idx + 1) % state.deck.length;
+    renderCard();
+    animShake(scene);
+  };
+
+  if (state.flipped) {
+    state.flipped = false;
+    flipper.classList.remove('is-flipped');
+    setTimeout(advance, 380);
+  } else {
+    advance();
+  }
+}
+
+function shuffleAll() {
+  state.deck    = shuffle(DB[state.cat]);
+  state.idx     = 0;
+  state.flipped = false;
+  document.getElementById('card-flipper').classList.remove('is-flipped');
+  renderCard();
+  animShake(document.getElementById('card-scene'));
+}
+
+function animShake(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+}
+
+/* Keyboard */
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('screen-game').classList.contains('active')) return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  if (e.key === 'ArrowRight')             { e.preventDefault(); nextCard(); }
+});
+</script>
+</body>
+</html>
